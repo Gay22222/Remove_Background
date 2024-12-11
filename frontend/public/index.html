@@ -1,41 +1,35 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8"> <!-- Đặt mã hóa ký tự UTF-8 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Đảm bảo giao diện responsive trên các thiết bị -->
-    <title>Object Detection Chat</title> <!-- Tiêu đề trang -->
-    <!-- Tham chiếu file CSS -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Detection Chat</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <!-- Thêm favicon -->
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
-    <!-- Container chính của ứng dụng -->
     <div class="chat-container">
-        <!-- Header: Hiển thị tiêu đề của ứng dụng -->
         <header class="chat-header">
-            <h1>Object Detection Chat</h1> <!-- Tiêu đề chính -->
+            <h1>Object Detection Chat</h1>
         </header>
-        <!-- Main: Vùng hiển thị nội dung chính -->
         <main class="chat-main">
-            <!-- Phần hiển thị kết quả nhận dạng -->
+            <!-- Phần hiển thị kết quả -->
             <div class="chat-output" id="chatOutput">
-                <!-- Tin nhắn mặc định của bot -->
                 <p class="bot-message">Welcome! Upload an image to detect objects.</p>
             </div>
-            <!-- Form để tải ảnh lên -->
+            <!-- Phần checkbox -->
+            <div id="detectedObjects" class="checkbox-container"></div> <!-- Container danh sách checkbox -->
+            <!-- Form tải ảnh -->
             <form id="uploadForm" class="chat-input">
-                <input type="file" id="fileInput" name="file" accept="image/*"> <!-- Trường chọn file ảnh -->
-                <button type="submit" id="uploadButton">Gửi</button> <!-- Nút gửi form -->
+                <input type="file" id="fileInput" name="file" accept="image/*">
+                <button type="submit" id="uploadButton">Gửi</button>
             </form>
-            
-            <!-- Nút Delete Selected Objects -->
+            <!-- Nút Delete -->
             <div class="delete-container">
-                <button id="submitDeleteButton">Xóa vật thể đã chọn</button> <!-- Nút để gửi yêu cầu xóa -->
+                <button id="submitDeleteButton" disabled>Xóa vật thể đã chọn</button>
             </div>
-        </main>
+        </main>        
     </div>
-    <!-- Tham chiếu file JavaScript -->
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 </body>
 </html>
