@@ -1,31 +1,38 @@
 import numpy as np
 from PIL import Image
-from models.mask_rcnn import detect_mask  # Import detect_mask từ mask_rcnn.py
+from models.mask_rcnn import detect_mask  # Import hàm detect_mask từ file mask_rcnn.py
 
-def create_mask(image_path, object_to_remove, mask_rcnn, transforms):
+def create_mask(image_path, bounding_boxes, mask_rcnn, transforms):
     """
-    Tạo mặt nạ (mask) cho đối tượng cần xóa bằng Mask-RCNN.
+    Tạo mặt nạ (mask) dựa trên bounding boxes và Mask-RCNN.
 
     Args:
         image_path (str): Đường dẫn đến ảnh gốc.
-        object_to_remove (str): Tên hoặc nhãn của đối tượng cần xóa.
-        mask_rcnn: Đối tượng mô hình Mask-RCNN.
-        transforms: Các phép biến đổi cần thiết cho ảnh đầu vào.
+        bounding_boxes (list): Danh sách các bounding boxes từ YOLO.
+        mask_rcnn (model): Mô hình Mask-RCNN.
+        transforms (callable): Các phép biến đổi cần thiết cho ảnh đầu vào.
 
     Returns:
-        mask (numpy.array): Mặt nạ nhị phân (binary mask) của đối tượng cần xóa.
+        numpy.array: Mặt nạ nhị phân (binary mask) kết hợp của tất cả các bounding boxes.
     """
-    image = Image.open(image_path).convert("RGB")  # Mở ảnh và chuyển đổi sang RGB
-    outputs = detect_mask(image, mask_rcnn, transforms)  # Phát hiện bằng Mask-RCNN
+    # Đọc ảnh từ đường dẫn và chuyển sang định dạng RGB
+    image = Image.open(image_path).convert("RGB")
 
-    # Duyệt qua các nhãn để tìm đối tượng cần xóa
-    for i, label in enumerate(outputs['labels']):
-        # So sánh nhãn với tên đối tượng cần xóa
-        if label == object_to_remove:
-            # Trả về mặt nạ đầu tiên tìm được
-            return outputs['masks'][i, 0]  # Lấy mặt nạ của đối tượng cần xóa
+    # Truyền bounding boxes vào hàm detect_mask để tạo mặt nạ
+    outputs = detect_mask(image, mask_rcnn, transforms, yolo_boxes=bounding_boxes)
 
-    return None  # Nếu không tìm thấy đối tượng
+    # Kiểm tra nếu không tìm thấy mặt nạ nào
+    if len(outputs['masks']) == 0:
+        raise ValueError("No masks found for the selected bounding boxes.")
+
+    # Khởi tạo mặt nạ kết hợp với kích thước giống mặt nạ đầu tiên
+    combined_mask = np.zeros_like(outputs['masks'][0], dtype=np.uint8)
+
+    # Kết hợp tất cả các mặt nạ bằng cách lấy giá trị lớn nhất
+    for mask in outputs['masks']:
+        combined_mask = np.maximum(combined_mask, mask)
+
+    return combined_mask
 
 def apply_mask(image, mask):
     """
@@ -38,10 +45,9 @@ def apply_mask(image, mask):
     Returns:
         masked_image (numpy.array): Ảnh đã được áp dụng mặt nạ.
     """
-    # Mở rộng mặt nạ từ (H, W) thành (H, W, 3) để khớp với ảnh RGB
+    # Mở rộng mặt nạ từ kích thước (H, W) thành (H, W, 3) để khớp với ảnh RGB
     expanded_mask = np.stack([mask] * 3, axis=-1)
 
-    # Áp dụng mặt nạ (mask) lên ảnh
-    masked_image = image * (1 - expanded_mask)  # Vùng được xóa sẽ là 0
+    # Áp dụng mặt nạ để loại bỏ đối tượng (giá trị tại vùng bị xóa sẽ là 0)
+    masked_image = image * (1 - expanded_mask)
     return masked_image
-

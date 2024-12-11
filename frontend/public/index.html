@@ -3,32 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Object Detection Chat</title>
+    <title>Object detection and remove</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
     <div class="chat-container">
         <header class="chat-header">
-            <h1>Object Detection Chat</h1>
+            <h1>Nhận diện vật thể và xóa</h1>
         </header>
         <main class="chat-main">
-            <!-- Phần hiển thị kết quả -->
             <div class="chat-output" id="chatOutput">
-                <p class="bot-message">Welcome! Upload an image to detect objects.</p>
+                <p class="bot-message">Chào mừng, vui lòng tải ảnh lên</p>
             </div>
-            <!-- Phần checkbox -->
-            <div id="detectedObjects" class="checkbox-container"></div> <!-- Container danh sách checkbox -->
-            <!-- Form tải ảnh -->
+            <div id="detectedObjects" class="checkbox-container">
+            </div>
             <form id="uploadForm" class="chat-input">
                 <input type="file" id="fileInput" name="file" accept="image/*">
                 <button type="submit" id="uploadButton">Gửi</button>
             </form>
-            <!-- Nút Delete -->
             <div class="delete-container">
-                <button id="submitDeleteButton" disabled>Xóa vật thể đã chọn</button>
+                <button id="submitDeleteButton" disabled>Xóa đối tượng đã chọn</button>
+                <button id="resetButton" class="reset-button">Reset</button>
             </div>
-        </main>        
+        </main>
     </div>
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 </body>
